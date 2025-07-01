@@ -3,7 +3,7 @@
 ## Dashboard Features
 - [x] Generate Phoenix LiveView project `logistics_quotes`
 - [x] Add Ash dependencies (ash, ash_phoenix, ash_postgres, decimal)
-- [ ] Start server and create plan.md
+- [x] Create plan.md (skipping server start for now)
 - [ ] Replace home page with static dashboard mockup showing:
   - Online users by branch within organization
   - Quote search form interface
@@ -40,3 +40,4 @@
 - [ ] Update layouts for professional logistics design
 - [ ] Update router and test functionality
 - [ ] Visit running app to verify - 1 step reserved for debugging
+
