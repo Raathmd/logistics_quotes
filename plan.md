@@ -35,10 +35,13 @@
   - Quote search form with API integration
   - Account selection constraint for multi-tenancy
 
+## Database Setup
+- [x] Create Ecto migrations for persisted resources
+- [x] Run migrations successfully (organizations, accounts, branches, users)
+
 ## Next Steps Needed
-- [ ] Debug server startup issues
-- [ ] Create Ecto migrations for persisted resources
 - [ ] Add seed data for testing (orgs, accounts, users, branches)
+- [ ] Debug server startup issues
 - [ ] Test API integration with real data
 - [ ] Visit running app to verify functionality
 
@@ -47,3 +50,4 @@
 - Users have selected Account (for API data filtering only)
 - Organization has many Users, Accounts, Branches
 - Account belongs to Organization (no direct user relationship)
+
