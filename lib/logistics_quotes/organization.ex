@@ -40,7 +40,6 @@ defmodule LogisticsQuotes.Organization do
 
   validations do
     validate(present([:name, :code]))
-    validate(unique([:code]))
   end
 
   identities do
