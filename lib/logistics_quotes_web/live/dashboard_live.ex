@@ -38,7 +38,7 @@ defmodule LogisticsQuotesWeb.DashboardLive do
       "" ->
         {:noreply, put_flash(socket, :error, "Please select an account")}
 
-      account_id ->
+      _account_id ->
         # Build filters for the API call
         filters = build_search_filters(search_params)
 
