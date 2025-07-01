@@ -11,10 +11,10 @@
 
 ## Persisted Ash Resources & Domain
 - [x] Create Ash domain (LogisticsQuotes.Domain)
-- [x] Create persisted resources with relationships:
-  - Organization (has_many :accounts, :branches)
-  - Account (belongs_to :organization, has_many :users)
-  - User (belongs_to :account, belongs_to :branch)
+- [x] Create persisted resources with corrected relationships:
+  - Organization (has_many :accounts, :branches, :users)
+  - Account (belongs_to :organization) - used for API data restriction only
+  - User (belongs_to :organization, :account, :branch) - primary relationship to org
   - Branch (belongs_to :organization)
   - Add presence tracking for online users
 
@@ -35,9 +35,15 @@
   - Quote search form with API integration
   - Account selection constraint for multi-tenancy
 
-## Integration & Polish
-- [x] Wire API actions to LiveView events
-- [x] Update layouts for professional logistics design
-- [x] Update router and test functionality
-- [x] Visit running app to verify - 1 step reserved for debugging
+## Next Steps Needed
+- [ ] Debug server startup issues
+- [ ] Create Ecto migrations for persisted resources
+- [ ] Add seed data for testing (orgs, accounts, users, branches)
+- [ ] Test API integration with real data
+- [ ] Visit running app to verify functionality
 
+## Relationship Structure (Corrected)
+- Users belong to Organization (primary relationship)
+- Users have selected Account (for API data filtering only)
+- Organization has many Users, Accounts, Branches
+- Account belongs to Organization (no direct user relationship)
