@@ -1,7 +1,7 @@
 defmodule LogisticsQuotesWeb.DashboardLive do
   use LogisticsQuotesWeb, :live_view
   alias LogisticsQuotes.Domain
-  alias LogisticsQuotes.{Organization, Account, User, Branch, Quote}
+  alias LogisticsQuotes.{Domain, Quote}
 
   def mount(_params, _session, socket) do
     # For demo purposes, we'll use a mock organization
