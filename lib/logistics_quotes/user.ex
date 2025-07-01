@@ -58,8 +58,6 @@ defmodule LogisticsQuotes.User do
 
   validations do
     validate(present([:name, :email, :username, :account_id, :branch_id]))
-    validate(unique([:email]))
-    validate(unique([:username]))
   end
 
   identities do
