@@ -24,10 +24,6 @@ defmodule LogisticsQuotes.Account do
       source_attribute(:organization_id)
       destination_attribute(:id)
     end
-
-    has_many(:users, LogisticsQuotes.User) do
-      destination_attribute(:account_id)
-    end
   end
 
   actions do
