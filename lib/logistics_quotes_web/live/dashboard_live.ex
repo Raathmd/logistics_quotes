@@ -43,7 +43,7 @@ defmodule LogisticsQuotesWeb.DashboardLive do
         filters = build_search_filters(search_params)
 
         # Call the search action
-        case Domain.read(Quote, :search, filters: filters) do
+        case Ash.read!(Quote, :search, domain: Domain, filters: filters) do
           {:ok, quotes} ->
             {:noreply,
              socket
