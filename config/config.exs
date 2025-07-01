@@ -9,7 +9,8 @@ import Config
 
 config :logistics_quotes,
   ecto_repos: [LogisticsQuotes.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  ash_domains: [LogisticsQuotes.Domain]
 
 # Configures the endpoint
 config :logistics_quotes, LogisticsQuotesWeb.Endpoint,
