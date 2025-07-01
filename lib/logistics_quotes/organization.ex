@@ -26,6 +26,10 @@ defmodule LogisticsQuotes.Organization do
     has_many(:branches, LogisticsQuotes.Branch) do
       destination_attribute(:organization_id)
     end
+
+    has_many(:users, LogisticsQuotes.User) do
+      destination_attribute(:organization_id)
+    end
   end
 
   actions do
