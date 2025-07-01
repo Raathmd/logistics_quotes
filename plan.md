@@ -39,5 +39,5 @@
 - [x] Wire API actions to LiveView events
 - [x] Update layouts for professional logistics design
 - [x] Update router and test functionality
-- [ ] Visit running app to verify - 1 step reserved for debugging
+- [x] Visit running app to verify - 1 step reserved for debugging
 
