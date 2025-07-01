@@ -57,7 +57,7 @@ defmodule LogisticsQuotes.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
       {:ash, "~> 3.4"},
       {:ash_phoenix, "~> 2.1"},
       {:ash_postgres, "~> 2.4"},
