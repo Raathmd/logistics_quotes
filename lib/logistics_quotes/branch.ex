@@ -41,7 +41,6 @@ defmodule LogisticsQuotes.Branch do
 
   validations do
     validate(present([:name, :code, :organization_id]))
-    validate(unique([:code]))
   end
 
   identities do
