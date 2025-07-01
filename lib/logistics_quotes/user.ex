@@ -16,6 +16,7 @@ defmodule LogisticsQuotes.User do
     attribute(:username, :string, allow_nil?: false, public?: true)
     attribute(:active, :boolean, default: true, public?: true)
     attribute(:last_seen_at, :utc_datetime, public?: true)
+    attribute(:organization_id, :uuid, allow_nil?: false, public?: true)
     attribute(:account_id, :uuid, allow_nil?: false, public?: true)
     attribute(:branch_id, :uuid, allow_nil?: false, public?: true)
 
@@ -23,6 +24,11 @@ defmodule LogisticsQuotes.User do
   end
 
   relationships do
+    belongs_to(:organization, LogisticsQuotes.Organization) do
+      source_attribute(:organization_id)
+      destination_attribute(:id)
+    end
+
     belongs_to(:account, LogisticsQuotes.Account) do
       source_attribute(:account_id)
       destination_attribute(:id)
@@ -36,6 +42,11 @@ defmodule LogisticsQuotes.User do
 
   actions do
     defaults([:create, :read, :update, :destroy])
+
+    read(:by_organization) do
+      argument(:organization_id, :uuid, allow_nil?: false)
+      filter(expr(organization_id == ^arg(:organization_id)))
+    end
 
     read(:by_account) do
       argument(:account_id, :uuid, allow_nil?: false)
@@ -57,7 +68,7 @@ defmodule LogisticsQuotes.User do
   end
 
   validations do
-    validate(present([:name, :email, :username, :account_id, :branch_id]))
+    validate(present([:name, :email, :username, :organization_id, :account_id, :branch_id]))
   end
 
   identities do
