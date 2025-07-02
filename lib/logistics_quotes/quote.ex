@@ -81,7 +81,6 @@ defmodule LogisticsQuotes.Quote do
     # Quote type indicator (for our internal use)
     attribute(:quote_type, :atom, default: :quick, constraints: [one_of: [:quick, :full]])
 
-
     # Embedded collections
     attribute(:items, {:array, LogisticsQuotes.QuoteItem}, default: [])
     attribute(:sundries, {:array, LogisticsQuotes.QuoteSundry}, default: [])
@@ -208,7 +207,7 @@ defmodule LogisticsQuotes.Quote do
         :items,
         :sundries
       ])
-
+    end
 
     update :update do
       primary?(true)
