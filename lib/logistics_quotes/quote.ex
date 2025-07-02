@@ -89,16 +89,6 @@ defmodule LogisticsQuotes.Quote do
     timestamps()
   end
 
-  validations do
-    )
-
-    )
-
-    )
-
-    )
-
-    end)
   end
 
   changes do
