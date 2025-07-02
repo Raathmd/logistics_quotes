@@ -208,11 +208,4 @@ defmodule LogisticsQuotes.Quote do
       ])
     end
   end
-
-  # Manual actions for API integration
-  actions do
-    action(:search_quotes, LogisticsQuotes.Actions.SearchQuotes)
-    action(:quick_quote, LogisticsQuotes.Actions.QuickQuote)
-    action(:create_quote, LogisticsQuotes.Actions.CreateQuote)
-  end
 end
