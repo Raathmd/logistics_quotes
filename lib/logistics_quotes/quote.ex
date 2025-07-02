@@ -147,7 +147,7 @@ defmodule LogisticsQuotes.Quote do
 
       total_weight =
         items
-        |> Enum.map(&(&1.weight || Decimal.new(0)))
+        |> Enum.map(&(&1.total_weight || Decimal.new(0)))
         |> Enum.reduce(Decimal.new(0), &Decimal.add/2)
 
       total_quantity =
