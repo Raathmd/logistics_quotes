@@ -90,50 +90,14 @@ defmodule LogisticsQuotes.Quote do
   end
 
   validations do
-    validate(present([:consignor_suburb, :consignor_city, :consignor_postal_code]),
-      where: [quote_type: :quick]
     )
 
-    validate(present([:consignee_suburb, :consignee_city, :consignee_postal_code]),
-      where: [quote_type: :quick]
     )
 
-    validate(
-      present([
-        :consignor_name,
-        :consignor_building,
-        :consignor_street,
-        :consignor_suburb,
-        :consignor_city,
-        :consignor_postal_code,
-        :consignor_contact_name,
-        :consignor_contact_tel
-      ]),
-      where: [quote_type: :full]
     )
 
-    validate(
-      present([
-        :consignee_name,
-        :consignee_building,
-        :consignee_street,
-        :consignee_suburb,
-        :consignee_city,
-        :consignee_postal_code,
-        :consignee_contact_name,
-        :consignee_contact_tel
-      ]),
-      where: [quote_type: :full]
     )
 
-    validate(fn changeset, _context ->
-      items = Ash.Changeset.get_attribute(changeset, :items) || []
-
-      if Enum.empty?(items) do
-        {:error, field: :items, message: "must have at least one item"}
-      else
-        :ok
-      end
     end)
   end
 
