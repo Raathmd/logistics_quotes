@@ -79,7 +79,7 @@ defmodule LogisticsQuotes.Quote do
     attribute(:shipment_date, :date, allow_nil?: true)
 
     # Quote type indicator (for our internal use)
-    attribute :quote_type, :atom, default: :quick do
+    attribute :quote_type, :atom, default: :quick
       constraints(one_of: [:quick, :full])
     end
 
