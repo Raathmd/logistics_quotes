@@ -18,6 +18,7 @@ defmodule LogisticsQuotesWeb.Router do
     pipe_through :browser
 
     live "/", DashboardLive
+    live "/quotes/new", QuoteLive
   end
 
   # Other scopes may use custom stacks.
