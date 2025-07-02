@@ -1,53 +1,49 @@
-# Logistics Quotes Management System Plan
+# Logistics Management Dashboard Plan
 
-## Dashboard Features
-- [x] Generate Phoenix LiveView project `logistics_quotes`
-- [x] Add Ash dependencies (ash, ash_phoenix, ash_postgres, decimal)
-- [x] Create plan.md (skipping server start for now)
-- [x] Replace home page with static dashboard mockup showing:
-  - Online users by branch within organization
-  - Quote search form interface
-  - Professional logistics design
+## ✅ Completed Infrastructure
+- [x] PostgreSQL database with all tables (organizations, accounts, users, branches)
+- [x] Ash resources for Organization, Account, User, Branch (all working)
+- [x] Seed data populated with test organizations and users
+- [x] GitHub backup configured
 
-## Persisted Ash Resources & Domain
-- [x] Create Ash domain (LogisticsQuotes.Domain)
-- [x] Create persisted resources with corrected relationships:
-  - Organization (has_many :accounts, :branches, :users)
-  - Account (belongs_to :organization) - used for API data restriction only
-  - User (belongs_to :organization, :account, :branch) - primary relationship to org
-  - Branch (belongs_to :organization)
-  - Add presence tracking for online users
+## 🎯 Dashboard UI Implementation Plan
 
-## Non-Persisted Quote Resources (Embedded)
-- [x] Create embedded quote resources:
-  - Quote (with items, sundries, rates)
-  - QuoteItem, QuoteSundry, QuoteRate
-  - Input validation schemas only
+### Phase 1: Core Dashboard & Navigation
+- [ ] Fix any compilation issues preventing server start
+- [ ] Create main dashboard LiveView with navigation sidebar
+- [ ] Start server and create static design mockup
+- [ ] Update layouts to match existing design theme
 
-## API Integration with FreightWare Auth
-- [x] Create FreightWareAPI HTTP client with fw_login authentication
-- [x] Complete manual actions using token auth:
-  - SearchQuotes, QuickQuote, CreateQuote
+### Phase 2: Resource Management Pages  
+- [ ] **Organizations UI** - List, create, edit, delete organizations
+  - Full CRUD operations with Ash actions
+  - Organization details form (name, description, settings)
+- [ ] **Accounts UI** - List, create, edit, delete accounts
+  - Filtered by selected organization
+  - API credentials management
+- [ ] **Branches UI** - List, create, edit, delete branches  
+  - Filtered by selected account
+  - Location and contact details
+- [ ] **Users UI** - List, create, edit, delete users
+  - Organization and branch relationship management
+  - Role assignments and permissions
+- [ ] Update router with all resource routes
+- [ ] Style all forms and tables to match dashboard theme
+- [ ] Add real-time updates with PubSub for collaborative editing
 
-## LiveView Dashboard Interface
-- [x] Create main DashboardLive with:
-  - Real-time online users display by branch
-  - Quote search form with API integration
-  - Account selection constraint for multi-tenancy
+### Phase 3: Polish & Integration
+- [ ] Test all CRUD operations and data relationships
+- [ ] Final verification and cleanup
 
-## Database Setup
-- [x] Create Ecto migrations for persisted resources
-- [x] Run migrations successfully (organizations, accounts, branches, users)
+## 🎨 Design Theme
+- Match existing dashboard design (same colors, spacing, typography)
+- Clean data tables with professional styling
+- Responsive layout for desktop/tablet use
+- Consistent form styling across all resources
 
-## Next Steps Needed
-- [ ] Add seed data for testing (orgs, accounts, users, branches)
-- [ ] Debug server startup issues
-- [ ] Test API integration with real data
-- [ ] Visit running app to verify functionality
-
-## Relationship Structure (Corrected)
-- Users belong to Organization (primary relationship)
-- Users have selected Account (for API data filtering only)
-- Organization has many Users, Accounts, Branches
-- Account belongs to Organization (no direct user relationship)
-
+## 🚀 Success Criteria
+- All 4 resources (Organization, Account, Branch, User) have full CRUD UIs
+- Proper relationship filtering (accounts by org, branches by account, etc)
+- Real-time collaborative updates
+- Professional, consistent design
+- Server running without compilation errors
