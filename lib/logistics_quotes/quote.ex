@@ -79,9 +79,8 @@ defmodule LogisticsQuotes.Quote do
     attribute(:shipment_date, :date, allow_nil?: true)
 
     # Quote type indicator (for our internal use)
-    attribute :quote_type, :atom, default: :quick do
-      constraints(one_of: [:quick, :full])
-    end
+    attribute(:quote_type, :atom, default: :quick, constraints: [one_of: [:quick, :full]])
+
 
     # Embedded collections
     attribute(:items, {:array, LogisticsQuotes.QuoteItem}, default: [])
@@ -209,7 +208,7 @@ defmodule LogisticsQuotes.Quote do
         :items,
         :sundries
       ])
-    end
+
 
     update :update do
       primary?(true)
