@@ -1,0 +1,402 @@
+<Layouts.app flash={@flash}>
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Create Quote</h1>
+              <p class="text-sm text-gray-600 mt-1">Generate quotes for logistics services</p>
+            </div>
+            <div class="flex items-center space-x-4">
+              <.link navigate={~p"/"} class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Back to Dashboard
+              </.link>
+            </div>
+          </div>
+        </div>
+        
+<!-- Quote Type Toggle -->
+        <div class="px-6 py-4">
+          <div class="flex items-center space-x-4">
+            <span class="text-sm font-medium text-gray-700">Quote Type:</span>
+            <div class="flex bg-gray-100 rounded-lg p-1">
+              <button
+                type="button"
+                phx-click="change_quote_type"
+                phx-value-type="quick"
+                class={[
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  if(@quote_type == :quick,
+                    do: "bg-white text-blue-700 shadow-sm",
+                    else: "text-gray-600 hover:text-gray-900"
+                  )
+                ]}
+              >
+                Quick Quote
+              </button>
+              <button
+                type="button"
+                phx-click="change_quote_type"
+                phx-value-type="full"
+                class={[
+                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  if(@quote_type == :full,
+                    do: "bg-white text-blue-700 shadow-sm",
+                    else: "text-gray-600 hover:text-gray-900"
+                  )
+                ]}
+              >
+                Full Quote
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            <%= if @quote_type == :quick do %>
+              Quick quotes require basic address information for instant pricing
+            <% else %>
+              Full quotes require complete contact details and create official quotes
+            <% end %>
+          </p>
+        </div>
+      </div>
+      
+<!-- Quote Form -->
+      <.form
+        for={@form}
+        id="quote-form"
+        phx-change="validate"
+        phx-submit="submit_quote"
+        class="space-y-8"
+      >
+        <!-- Basic Information -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
+          </div>
+          <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <.input
+              field={@form[:account_reference]}
+              type="text"
+              label="Account Reference"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <.input
+              field={@form[:shipper_reference]}
+              type="text"
+              label="Shipper Reference"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <.input
+              field={@form[:shipment_date]}
+              type="date"
+              label="Shipment Date"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <%= if @quote_type == :full do %>
+              <.input
+                field={@form[:service_type]}
+                type="text"
+                label="Service Type"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Origin Address -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Origin (Consignor)</h2>
+          </div>
+          <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <%= if @quote_type == :full do %>
+              <.input
+                field={@form[:consignor_name]}
+                type="text"
+                label="Company Name"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignor_site]}
+                type="text"
+                label="Site"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignor_building]}
+                type="text"
+                label="Building"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignor_street]}
+                type="text"
+                label="Street"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+            <% end %>
+            <.input
+              field={@form[:consignor_suburb]}
+              type="text"
+              label="Suburb"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <.input
+              field={@form[:consignor_city]}
+              type="text"
+              label="City"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <.input
+              field={@form[:consignor_postal_code]}
+              type="text"
+              label="Postal Code"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <%= if @quote_type == :full do %>
+              <.input
+                field={@form[:consignor_contact_name]}
+                type="text"
+                label="Contact Name"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignor_contact_tel]}
+                type="text"
+                label="Contact Phone"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Destination Address -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Destination (Consignee)</h2>
+          </div>
+          <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <%= if @quote_type == :full do %>
+              <.input
+                field={@form[:consignee_name]}
+                type="text"
+                label="Company Name"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignee_site]}
+                type="text"
+                label="Site"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignee_building]}
+                type="text"
+                label="Building"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignee_street]}
+                type="text"
+                label="Street"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+            <% end %>
+            <.input
+              field={@form[:consignee_suburb]}
+              type="text"
+              label="Suburb"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <.input
+              field={@form[:consignee_city]}
+              type="text"
+              label="City"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <.input
+              field={@form[:consignee_postal_code]}
+              type="text"
+              label="Postal Code"
+              class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+            />
+            <%= if @quote_type == :full do %>
+              <.input
+                field={@form[:consignee_contact_name]}
+                type="text"
+                label="Contact Name"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:consignee_contact_tel]}
+                type="text"
+                label="Contact Phone"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Items -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-900">Items</h2>
+              <button
+                type="button"
+                phx-click="add_item"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                Add Item
+              </button>
+            </div>
+          </div>
+          <div class="px-6 py-6">
+            <%= for {item_form, index} <- Enum.with_index(@form[:items].value || []) do %>
+              <div class="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-sm font-medium text-gray-900">Item {index + 1}</h3>
+                  <%= if length(@form[:items].value || []) > 1 do %>
+                    <button
+                      type="button"
+                      phx-click="remove_item"
+                      phx-value-index={index}
+                      class="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      Remove
+                    </button>
+                  <% end %>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <.input
+                    field={@form[:items][index][:description]}
+                    type="text"
+                    label="Description"
+                    class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+                  />
+                  <.input
+                    field={@form[:items][index][:quantity]}
+                    type="number"
+                    label="Quantity"
+                    min="1"
+                    class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+                  />
+                  <.input
+                    field={@form[:items][index][:weight]}
+                    type="number"
+                    step="0.01"
+                    label="Weight (kg)"
+                    class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+                  />
+                  <.input
+                    field={@form[:items][index][:length]}
+                    type="number"
+                    step="0.01"
+                    label="Length (cm)"
+                    class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+                  />
+                  <.input
+                    field={@form[:items][index][:width]}
+                    type="number"
+                    step="0.01"
+                    label="Width (cm)"
+                    class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+                  />
+                  <.input
+                    field={@form[:items][index][:height]}
+                    type="number"
+                    step="0.01"
+                    label="Height (cm)"
+                    class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+                  />
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Additional Options (Full Quote Only) -->
+        <%= if @quote_type == :full do %>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">Additional Options</h2>
+            </div>
+            <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <.input
+                field={@form[:collection_instructions]}
+                type="textarea"
+                label="Collection Instructions"
+                rows="3"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:delivery_instructions]}
+                type="textarea"
+                label="Delivery Instructions"
+                rows="3"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+              <.input
+                field={@form[:value_declared]}
+                type="number"
+                step="0.01"
+                label="Declared Value"
+                class="rounded-lg border-gray-300 text-gray-900 bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-4 py-3"
+              />
+            </div>
+          </div>
+        <% end %>
+        
+<!-- Submit Button -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="px-6 py-6">
+            <div class="flex items-center justify-end space-x-4">
+              <.link navigate={~p"/"} class="text-gray-600 hover:text-gray-800 font-medium">
+                Cancel
+              </.link>
+              <button
+                type="submit"
+                disabled={@loading}
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <%= if @loading do %>
+                  <.icon name="hero-arrow-path" class="w-4 h-4 animate-spin mr-2" /> Processing...
+                <% else %>
+                  {if @quote_type == :quick, do: "Get Quick Quote", else: "Create Quote"}
+                <% end %>
+              </button>
+            </div>
+          </div>
+        </div>
+      </.form>
+      
+<!-- Quote Result -->
+      <%= if assigns[:quote_result] do %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mt-8">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Quote Result</h2>
+          </div>
+          <div class="px-6 py-6">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div class="text-sm text-green-800">
+                <p class="font-medium">Quote generated successfully!</p>
+                <%= if @quote_result.quote_number do %>
+                  <p class="mt-1">
+                    Quote Number: <span class="font-mono">{@quote_result.quote_number}</span>
+                  </p>
+                <% end %>
+                <%= if @quote_result.charged_amount do %>
+                  <p class="mt-1">
+                    Total Amount: <span class="font-bold">R {@quote_result.charged_amount}</span>
+                  </p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</Layouts.app>
