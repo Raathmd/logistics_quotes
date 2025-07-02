@@ -90,11 +90,177 @@ defmodule LogisticsQuotes.Quote do
   end
 
   validations do
+    validate(present([:consignor_suburb, :consignor_city, :consignor_postal_code]),
+      where: [quote_type: :quick]
     )
 
+    validate(present([:consignee_suburb, :consignee_city, :consignee_postal_code]),
+      where: [quote_type: :quick]
     )
 
+    validate(
+      present([
+        :consignor_name,
+        :consignor_building,
+        :consignor_street,
+        :consignor_suburb,
+        :consignor_city,
+        :consignor_postal_code,
+        :consignor_contact_name,
+        :consignor_contact_tel
+      ]),
+      where: [quote_type: :full]
     )
 
+    validate(
+      present([
+        :consignee_name,
+        :consignee_building,
+        :consignee_street,
+        :consignee_suburb,
+        :consignee_city,
+        :consignee_postal_code,
+        :consignee_contact_name,
+        :consignee_contact_tel
+      ]),
+      where: [quote_type: :full]
     )
 
+    validate(fn changeset, _context ->
+      items = Ash.Changeset.get_attribute(changeset, :items) || []
+
+      if Enum.empty?(items) do
+        {:error, field: :items, message: "must have at least one item"}
+      else
+        :ok
+      end
+    end)
+  end
+
+  changes do
+    change(fn changeset, _context ->
+      items = Ash.Changeset.get_attribute(changeset, :items) || []
+
+      total_weight =
+        items
+        |> Enum.map(&(&1.total_weight || Decimal.new(0)))
+        |> Enum.reduce(Decimal.new(0), &Decimal.add/2)
+
+      total_quantity =
+        items
+        |> Enum.map(&(&1.quantity || 1))
+        |> Enum.sum()
+
+      changeset
+      |> Ash.Changeset.change_attribute(:total_weight, total_weight)
+      |> Ash.Changeset.change_attribute(:total_quantity, total_quantity)
+    end)
+  end
+
+  actions do
+    defaults([:read])
+
+    create :create do
+      primary?(true)
+
+      accept([
+        :quote_number,
+        :account_reference,
+        :shipper_reference,
+        :service_type,
+        :consignment_type,
+        :quote_type,
+        :rate_type,
+        :collection_instructions,
+        :delivery_instructions,
+        :estimated_kilometres,
+        :billable_units,
+        :consignor_site,
+        :consignor_name,
+        :consignor_building,
+        :consignor_street,
+        :consignor_suburb,
+        :consignor_city,
+        :consignor_postal_code,
+        :consignor_contact_name,
+        :consignor_contact_tel,
+        :consignee_site,
+        :consignee_name,
+        :consignee_building,
+        :consignee_street,
+        :consignee_suburb,
+        :consignee_city,
+        :consignee_postal_code,
+        :consignee_contact_name,
+        :consignee_contact_tel,
+        :waybill_number,
+        :collection_reference,
+        :order_number,
+        :accepted_by,
+        :reject_reason,
+        :value_declared,
+        :paying_party,
+        :vehicle_category,
+        :shipment_date,
+        :items,
+        :sundries
+      ])
+    end
+
+    update :update do
+      primary?(true)
+
+      accept([
+        :quote_number,
+        :account_reference,
+        :shipper_reference,
+        :service_type,
+        :consignment_type,
+        :quote_type,
+        :rate_type,
+        :collection_instructions,
+        :delivery_instructions,
+        :estimated_kilometres,
+        :billable_units,
+        :consignor_site,
+        :consignor_name,
+        :consignor_building,
+        :consignor_street,
+        :consignor_suburb,
+        :consignor_city,
+        :consignor_postal_code,
+        :consignor_contact_name,
+        :consignor_contact_tel,
+        :consignee_site,
+        :consignee_name,
+        :consignee_building,
+        :consignee_street,
+        :consignee_suburb,
+        :consignee_city,
+        :consignee_postal_code,
+        :consignee_contact_name,
+        :consignee_contact_tel,
+        :waybill_number,
+        :collection_reference,
+        :order_number,
+        :accepted_by,
+        :reject_reason,
+        :value_declared,
+        :paying_party,
+        :vehicle_category,
+        :shipment_date,
+        :items,
+        :sundries,
+        :rates,
+        :charged_amount
+      ])
+    end
+  end
+
+  # Manual actions for API integration
+  actions do
+    action(:search_quotes, LogisticsQuotes.Actions.SearchQuotes)
+    action(:quick_quote, LogisticsQuotes.Actions.QuickQuote)
+    action(:create_quote, LogisticsQuotes.Actions.CreateQuote)
+  end
+end
