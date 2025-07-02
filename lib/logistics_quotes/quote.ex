@@ -92,11 +92,11 @@ defmodule LogisticsQuotes.Quote do
   validations do
     # Quick quote validations (minimal required fields)
     validate(present([:consignor_suburb, :consignor_city, :consignor_postal_code]),
-      where: [attribute(:quote_type, :quick)]
+      where: [quote_type: :quick]
     )
 
     validate(present([:consignee_suburb, :consignee_city, :consignee_postal_code]),
-      where: [attribute(:quote_type, :quick)]
+      where: [quote_type: :quick]
     )
 
     # Full quote validations (all required fields per API)
@@ -111,7 +111,7 @@ defmodule LogisticsQuotes.Quote do
         :consignor_contact_name,
         :consignor_contact_tel
       ]),
-      where: [attribute(:quote_type, :full)]
+      where: [quote_type: :full]
     )
 
     validate(
@@ -125,7 +125,7 @@ defmodule LogisticsQuotes.Quote do
         :consignee_contact_name,
         :consignee_contact_tel
       ]),
-      where: [attribute(:quote_type, :full)]
+      where: [quote_type: :full]
     )
 
     validate(fn changeset, _context ->
