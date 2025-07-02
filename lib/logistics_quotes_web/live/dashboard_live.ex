@@ -1,104 +1,99 @@
 defmodule LogisticsQuotesWeb.DashboardLive do
   use LogisticsQuotesWeb, :live_view
-  alias LogisticsQuotes.Domain
-  alias LogisticsQuotes.{Domain, Quote}
 
   def mount(_params, _session, socket) do
-    # For demo purposes, we'll use a mock organization
-    # In a real app, this would come from the current user's session
-    organization_id = "demo-org-id"
-
-    # Get online users grouped by branch
-    online_users = get_online_users_by_branch(organization_id)
-
-    # Get accounts for the organization (for account selection)
-    accounts = get_accounts_for_organization(organization_id)
-
-    # Initialize search form
-    search_form = %{
-      "account_id" => "",
-      "quote_number" => "",
-      "reference" => "",
-      "from_date" => "",
-      "to_date" => ""
-    }
-
     {:ok,
      socket
-     |> assign(:online_users, online_users)
-     |> assign(:accounts, accounts)
-     |> assign(:search_form, search_form)
-     |> assign(:search_results, [])
-     |> assign(:loading, false)
-     |> assign(:organization_name, "Acme Corp")}
+     |> assign(:page_title, "Dashboard")
+     |> assign(:active_nav, "dashboard")}
   end
 
-  def handle_event("search_quotes", %{"search" => search_params}, socket) do
-    case search_params["account_id"] do
-      "" ->
-        {:noreply, put_flash(socket, :error, "Please select an account")}
+  def render(assigns) do
+    ~H"""
+    <LogisticsQuotesWeb.Layouts.app flash={@flash} current_user={assigns[:current_user]}>
+      <div class="flex min-h-screen bg-gray-50">
+        <!-- Sidebar Navigation -->
+        <nav class="w-64 bg-white shadow-lg">
+          <div class="p-6">
+            <h1 class="text-2xl font-bold text-gray-800">Logistics Manager</h1>
+          </div>
 
-      _account_id ->
-        # Build filters for the API call
-        filters = build_search_filters(search_params)
+          <div class="px-4 pb-4">
+            <.nav_link navigate={~p"/"} active={@active_nav == "dashboard"}>
+              <Heroicons.home class="w-5 h-5 mr-3" /> Dashboard
+            </.nav_link>
 
-        # Call the search action
-        case Ash.read!(Quote, action: :search, domain: Domain, args: [filters: filters]) do
-          {:ok, quotes} ->
-            {:noreply,
-             socket
-             |> assign(:search_results, quotes)
-             |> assign(:search_form, search_params)
-             |> put_flash(:info, "Found #{length(quotes)} quotes")}
+            <.nav_link navigate={~p"/organizations"} active={@active_nav == "organizations"}>
+              <Heroicons.building_office class="w-5 h-5 mr-3" /> Organizations
+            </.nav_link>
 
-          {:error, error} ->
-            {:noreply,
-             socket
-             |> put_flash(:error, "Search failed: #{inspect(error)}")
-             |> assign(:loading, false)}
-        end
-    end
+            <.nav_link navigate={~p"/accounts"} active={@active_nav == "accounts"}>
+              <Heroicons.key class="w-5 h-5 mr-3" /> Accounts
+            </.nav_link>
+
+            <.nav_link navigate={~p"/branches"} active={@active_nav == "branches"}>
+              <Heroicons.map_pin class="w-5 h-5 mr-3" /> Branches
+            </.nav_link>
+
+            <.nav_link navigate={~p"/users"} active={@active_nav == "users"}>
+              <Heroicons.users class="w-5 h-5 mr-3" /> Users
+            </.nav_link>
+          </div>
+        </nav>
+        
+    <!-- Main Content -->
+        <main class="flex-1 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Dashboard Overview</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <.stat_card title="Organizations" value="Loading..." icon="building-office" />
+            <.stat_card title="Accounts" value="Loading..." icon="key" />
+            <.stat_card title="Branches" value="Loading..." icon="map-pin" />
+            <.stat_card title="Users" value="Loading..." icon="users" />
+          </div>
+        </main>
+      </div>
+    </LogisticsQuotesWeb.Layouts.app>
+    """
   end
 
-  def handle_event("quick_quote", _params, socket) do
-    # For demo purposes, we'll show a success message
-    # In a real app, this would open a quick quote form
-    {:noreply, put_flash(socket, :info, "Quick quote feature coming soon!")}
+  attr :navigate, :string, required: true
+  attr :active, :boolean, default: false
+  slot :inner_block, required: true
+
+  defp nav_link(assigns) do
+    ~H"""
+    <.link
+      navigate={@navigate}
+      class={[
+        "flex items-center px-4 py-3 text-sm font-medium rounded-lg mb-1 transition-colors",
+        if(@active, do: "bg-blue-100 text-blue-700", else: "text-gray-600 hover:bg-gray-100")
+      ]}
+    >
+      {render_slot(@inner_block)}
+    </.link>
+    """
   end
 
-  def handle_event("validate_search", %{"search" => search_params}, socket) do
-    {:noreply, assign(socket, :search_form, search_params)}
-  end
+  attr :title, :string, required: true
+  attr :value, :string, required: true
+  attr :icon, :string, required: true
 
-  defp get_online_users_by_branch(_organization_id) do
-    # Mock data for demo - in real app, this would query the database
-    # and filter by last_seen_at within the last 5 minutes
-    %{
-      "Main Office" => [
-        %{name: "John Doe", status: "online"},
-        %{name: "Sarah Wilson", status: "online"}
-      ],
-      "Warehouse A" => [
-        %{name: "Mike Johnson", status: "online"}
-      ],
-      "Regional Hub" => [
-        %{name: "Emma Davis", status: "away"}
-      ]
-    }
-  end
-
-  defp get_accounts_for_organization(_organization_id) do
-    # Mock data for demo - in real app, this would query the database
-    [
-      %{id: "account-1", name: "ABC Shipping Ltd"},
-      %{id: "account-2", name: "Global Transport Co"},
-      %{id: "account-3", name: "Express Logistics Inc"}
-    ]
-  end
-
-  defp build_search_filters(search_params) do
-    search_params
-    |> Enum.reject(fn {_key, value} -> value == "" end)
-    |> Map.new()
+  defp stat_card(assigns) do
+    ~H"""
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Heroicons.building_office class="w-5 h-5 text-blue-600" />
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">{@title}</p>
+          <p class="text-2xl font-semibold text-gray-900">{@value}</p>
+        </div>
+      </div>
+    </div>
+    """
   end
 end
