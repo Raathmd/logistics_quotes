@@ -89,8 +89,6 @@ defmodule LogisticsQuotes.Quote do
     timestamps()
   end
 
-  end
-
   changes do
     change(fn changeset, _context ->
       items = Ash.Changeset.get_attribute(changeset, :items) || []
