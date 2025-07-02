@@ -6,9 +6,5 @@ defmodule LogisticsQuotes.Domain do
     resource(LogisticsQuotes.Account)
     resource(LogisticsQuotes.User)
     resource(LogisticsQuotes.Branch)
-    resource(LogisticsQuotes.Quote)
-    resource(LogisticsQuotes.QuoteItem)
-    resource(LogisticsQuotes.QuoteSundry)
-    resource(LogisticsQuotes.QuoteRate)
   end
 end
