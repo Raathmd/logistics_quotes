@@ -82,9 +82,9 @@ defmodule LogisticsQuotes.Quote do
     attribute(:quote_type, :atom, default: :quick, constraints: [one_of: [:quick, :full]])
 
     # Embedded collections
-    attribute(:items, {:array, LogisticsQuotes.QuoteItem}, default: [])
-    attribute(:sundries, {:array, LogisticsQuotes.QuoteSundry}, default: [])
-    attribute(:rates, {:array, LogisticsQuotes.QuoteRate}, default: [])
+    attribute(:items, {:array, :map}, default: [])
+    attribute(:sundries, {:array, :map}, default: [])
+    attribute(:rates, {:array, :map}, default: [])
 
     timestamps()
   end
