@@ -8,7 +8,7 @@ defmodule LogisticsQuotesWeb.QuoteLive do
     default_item = %QuoteItem{
       description: "",
       quantity: 1,
-      weight: Decimal.new(0),
+      total_weight: Decimal.new(0),
       length: Decimal.new(0),
       width: Decimal.new(0),
       height: Decimal.new(0)
@@ -72,7 +72,7 @@ defmodule LogisticsQuotesWeb.QuoteLive do
     new_item = %QuoteItem{
       description: "",
       quantity: 1,
-      weight: Decimal.new(0),
+      total_weight: Decimal.new(0),
       length: Decimal.new(0),
       width: Decimal.new(0),
       height: Decimal.new(0)
