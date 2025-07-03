@@ -11,7 +11,7 @@ defmodule LogisticsQuotes.User do
   end
 
   authentication do
-    api(LogisticsQuotes.Domain)
+    domain(LogisticsQuotes.Domain)
 
     strategies do
       password :password do
