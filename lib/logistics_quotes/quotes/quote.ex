@@ -95,7 +95,6 @@ defmodule LogisticsQuotes.Quotes.Quote do
     update :update do
       accept([
         :quote_number,
-        :customer_name,
         :customer_email,
         :customer_phone,
         :origin_address,
