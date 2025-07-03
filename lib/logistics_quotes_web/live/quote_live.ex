@@ -1,166 +1,212 @@
 defmodule LogisticsQuotesWeb.QuoteLive do
   use LogisticsQuotesWeb, :live_view
-  alias LogisticsQuotes.Quote
-  alias LogisticsQuotes.QuoteItem
+  alias LogisticsQuotes.Quotes.Quote
 
   def mount(_params, _session, socket) do
-    # Create empty quote with one item to start
-    default_item = %QuoteItem{
-      description: "",
-      quantity: 1,
-      total_weight: Decimal.new(0),
-      length: Decimal.new(0),
-      width: Decimal.new(0),
-      height: Decimal.new(0)
-    }
-
+    # Initialize empty quote form
     quote_attrs = %{
-      quote_type: :quick,
-      items: [default_item],
-      shipment_date: Date.utc_today()
+      account_reference: "",
+      service_type: "",
+      consignment_type: "",
+      consignor_site: "",
+      consignor_name: "",
+      consignor_building: "",
+      consignor_street: "",
+      consignor_suburb: "",
+      consignor_city: "",
+      consignor_postal_code: "",
+      consignor_contact_name: "",
+      consignor_contact_tel: "",
+      consignee_site: "",
+      consignee_name: "",
+      consignee_building: "",
+      consignee_street: "",
+      consignee_suburb: "",
+      consignee_city: "",
+      consignee_postal_code: "",
+      consignee_contact_name: "",
+      consignee_contact_tel: "",
+      collection_instructions: "",
+      delivery_instructions: "",
+      shipper_reference: "",
+      order_number: "",
+      value_declared: nil,
+      paying_party: "",
+      vehicle_category: "",
+      items: [
+        %{
+          quantity: 1,
+          product_code: "",
+          description: "",
+          total_weight: 0.1,
+          length: 10,
+          width: 10,
+          height: 10
+        }
+      ],
+      sundries: []
     }
 
-    form = Quote.create(quote_attrs) |> to_form()
+    form = quote_attrs |> to_form()
 
     {:ok,
      socket
      |> assign(:form, form)
-     |> assign(:quote_type, :quick)
-     |> assign(:page_title, "Create Quote")
-     |> assign(:loading, false)}
+     |> assign(:show_modal, false)
+     |> assign(:modal_title, "")
+     |> assign(:modal_content, "")
+     |> assign(:active_nav, "quotes")}
   end
 
   def handle_event("validate", %{"quote" => quote_params}, socket) do
-    # Validate the form and update socket
-    case Quote.create(quote_params) do
-      {:ok, quote} ->
-        form = to_form(quote)
-        {:noreply, assign(socket, :form, form)}
-
-      {:error, changeset} ->
-        form = to_form(changeset)
-        {:noreply, assign(socket, :form, form)}
-    end
-  end
-
-  def handle_event("change_quote_type", %{"type" => type}, socket) do
-    quote_type = String.to_existing_atom(type)
-
-    # Get current form data and update quote type
-    current_attrs = form_to_attrs(socket.assigns.form)
-    updated_attrs = Map.put(current_attrs, :quote_type, quote_type)
-
-    case Quote.create(updated_attrs) do
-      {:ok, quote} ->
-        form = to_form(quote)
-
-        {:noreply,
-         socket
-         |> assign(:form, form)
-         |> assign(:quote_type, quote_type)}
-
-      {:error, changeset} ->
-        form = to_form(changeset)
-        {:noreply, assign(socket, :form, form)}
-    end
+    # Update form with new values for live validation
+    form = quote_params |> to_form()
+    {:noreply, assign(socket, :form, form)}
   end
 
   def handle_event("add_item", _params, socket) do
-    current_attrs = form_to_attrs(socket.assigns.form)
-    current_items = current_attrs[:items] || []
+    current_items = socket.assigns.form.params["items"] || []
 
-    new_item = %QuoteItem{
-      description: "",
-      quantity: 1,
-      total_weight: Decimal.new(0),
-      length: Decimal.new(0),
-      width: Decimal.new(0),
-      height: Decimal.new(0)
+    new_item = %{
+      "quantity" => "1",
+      "product_code" => "",
+      "description" => "",
+      "total_weight" => "0.1",
+      "length" => "10",
+      "width" => "10",
+      "height" => "10"
     }
 
-    updated_attrs = Map.put(current_attrs, :items, current_items ++ [new_item])
+    updated_params = Map.put(socket.assigns.form.params, "items", current_items ++ [new_item])
+    form = updated_params |> to_form()
 
-    case Quote.create(updated_attrs) do
-      {:ok, quote} ->
-        form = to_form(quote)
-        {:noreply, assign(socket, :form, form)}
-
-      {:error, changeset} ->
-        form = to_form(changeset)
-        {:noreply, assign(socket, :form, form)}
-    end
+    {:noreply, assign(socket, :form, form)}
   end
 
   def handle_event("remove_item", %{"index" => index_str}, socket) do
     index = String.to_integer(index_str)
-    current_attrs = form_to_attrs(socket.assigns.form)
-    current_items = current_attrs[:items] || []
+    current_items = socket.assigns.form.params["items"] || []
 
     if length(current_items) > 1 do
       updated_items = List.delete_at(current_items, index)
-      updated_attrs = Map.put(current_attrs, :items, updated_items)
-
-      case Quote.create(updated_attrs) do
-        {:ok, quote} ->
-          form = to_form(quote)
-          {:noreply, assign(socket, :form, form)}
-
-        {:error, changeset} ->
-          form = to_form(changeset)
-          {:noreply, assign(socket, :form, form)}
-      end
+      updated_params = Map.put(socket.assigns.form.params, "items", updated_items)
+      form = updated_params |> to_form()
+      {:noreply, assign(socket, :form, form)}
     else
       {:noreply, socket}
     end
   end
 
-  def handle_event("submit_quote", %{"quote" => quote_params}, socket) do
-    socket = assign(socket, :loading, true)
+  def handle_event("quick_quote", %{"quote" => quote_params}, socket) do
+    # Clean up params for quick quote action
+    cleaned_params = clean_quote_params(quote_params)
 
-    case socket.assigns.quote_type do
-      :quick ->
-        handle_quick_quote(quote_params, socket)
-
-      :full ->
-        handle_create_quote(quote_params, socket)
-    end
-  end
-
-  defp handle_quick_quote(quote_params, socket) do
-    case Quote.quick_quote(quote_params) do
-      {:ok, quote_with_rates} ->
+    case Ash.create(Quote, :quick_quote, cleaned_params) do
+      {:ok, quote} ->
         {:noreply,
          socket
-         |> assign(:loading, false)
-         |> assign(:quote_result, quote_with_rates)
-         |> put_flash(:info, "Quick quote generated successfully!")}
+         |> assign(:show_modal, true)
+         |> assign(:modal_title, "Quick Quote Result")
+         |> assign(:modal_content, format_quick_quote_response(quote))}
 
       {:error, error} ->
         {:noreply,
          socket
-         |> assign(:loading, false)
-         |> put_flash(:error, "Failed to generate quick quote: #{inspect(error)}")}
+         |> assign(:show_modal, true)
+         |> assign(:modal_title, "Quick Quote Error")
+         |> assign(:modal_content, "Error: #{inspect(error)}")}
     end
   end
 
-  defp handle_create_quote(quote_params, socket) do
-    case Quote.create_quote(quote_params) do
-      {:ok, created_quote} ->
+  def handle_event("create_quote", %{"quote" => quote_params}, socket) do
+    # Clean up params for create action
+    cleaned_params = clean_quote_params(quote_params)
+
+    case Ash.create(Quote, :create, cleaned_params) do
+      {:ok, quote} ->
         {:noreply,
          socket
-         |> assign(:loading, false)
-         |> assign(:quote_result, created_quote)
-         |> put_flash(:info, "Quote created successfully!")}
+         |> assign(:show_modal, true)
+         |> assign(:modal_title, "Quote Created")
+         |> assign(:modal_content, format_create_quote_response(quote))}
 
       {:error, error} ->
         {:noreply,
          socket
-         |> assign(:loading, false)
-         |> put_flash(:error, "Failed to create quote: #{inspect(error)}")}
+         |> assign(:show_modal, true)
+         |> assign(:modal_title, "Quote Creation Error")
+         |> assign(:modal_content, "Error: #{inspect(error)}")}
     end
   end
 
-  defp form_to_attrs(form) do
-    form.params || %{}
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, assign(socket, :show_modal, false)}
+  end
+
+  defp clean_quote_params(params) do
+    # Convert string values to appropriate types and clean up empty values
+    params
+    |> Map.update("items", [], fn items ->
+      Enum.map(items, fn item ->
+        %{
+          "quantity" => parse_integer(item["quantity"]),
+          "product_code" => item["product_code"] || "",
+          "description" => item["description"] || "",
+          "total_weight" => parse_decimal(item["total_weight"]),
+          "length" => parse_decimal(item["length"]),
+          "width" => parse_decimal(item["width"]),
+          "height" => parse_decimal(item["height"])
+        }
+      end)
+    end)
+    |> Map.update("sundries", [], fn sundries -> sundries end)
+    |> Enum.reject(fn {_k, v} -> v == "" or is_nil(v) end)
+    |> Map.new()
+  end
+
+  defp parse_integer(value) when is_binary(value) do
+    case Integer.parse(value) do
+      {int, _} -> int
+      :error -> 1
+    end
+  end
+
+  defp parse_integer(value) when is_integer(value), do: value
+  defp parse_integer(_), do: 1
+
+  defp parse_decimal(value) when is_binary(value) do
+    case Decimal.parse(value) do
+      {decimal, _} -> decimal
+      :error -> Decimal.new("0.1")
+    end
+  end
+
+  defp parse_decimal(value), do: Decimal.new(to_string(value))
+
+  defp format_quick_quote_response(quote) do
+    """
+    Quick Quote Generated Successfully!
+
+    Quote ID: #{quote.id}
+    Service Type: #{quote.service_type || "Standard"}
+    Total Items: #{length(quote.items || [])}
+
+    From: #{quote.consignor_suburb}, #{quote.consignor_city}
+    To: #{quote.consignee_suburb}, #{quote.consignee_city}
+    """
+  end
+
+  defp format_create_quote_response(quote) do
+    """
+    Quote Created Successfully!
+
+    Quote Number: #{quote.quote_number || "Pending"}
+    Quote ID: #{quote.id}
+    Service Type: #{quote.service_type || "Standard"}
+    Total Items: #{length(quote.items || [])}
+
+    Consignor: #{quote.consignor_name}
+    Consignee: #{quote.consignee_name}
+    """
   end
 end
