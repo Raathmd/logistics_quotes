@@ -11,60 +11,197 @@ defmodule LogisticsQuotes.Quotes.Quote do
   attributes do
     uuid_primary_key(:id)
 
+    # Quote fields
     attribute :quote_number, :string do
-      allow_nil?(false)
-      constraints(min_length: 1, max_length: 50)
+      constraints(max_length: 35)
     end
 
-    attribute :customer_name, :string do
-      allow_nil?(false)
-      constraints(min_length: 1, max_length: 255)
+    attribute :quote_obj, :decimal do
+      constraints(precision: 15, scale: 2)
     end
 
-    attribute :customer_email, :string do
-      allow_nil?(false)
-      constraints(match: ~r/^[^\s]+@[^\s]+\.[^\s]+$/)
+    attribute(:quote_date, :date)
+
+    attribute :account_reference, :string do
+      constraints(max_length: 15)
     end
 
-    attribute :customer_phone, :string do
-      constraints(min_length: 1, max_length: 20)
+    attribute :shipper_reference, :string do
+      constraints(max_length: 35)
     end
 
-    attribute :origin_address, :string do
-      allow_nil?(false)
-      constraints(min_length: 1, max_length: 500)
+    attribute :service_type, :string do
+      constraints(max_length: 10)
     end
 
-    attribute :destination_address, :string do
-      allow_nil?(false)
-      constraints(min_length: 1, max_length: 500)
+    attribute :service_type_description, :string do
+      constraints(max_length: 35)
     end
 
-    attribute :pickup_date, :date do
-      allow_nil?(false)
+    attribute :consignment_type, :string do
+      constraints(max_length: 10)
     end
 
-    attribute(:delivery_date, :date)
-
-    attribute :quote_type, :atom do
-      constraints(one_of: [:quick, :full])
-      default(:quick)
+    attribute :consignment_type_desc, :string do
+      constraints(max_length: 35)
     end
 
-    attribute :status, :atom do
-      constraints(one_of: [:draft, :sent, :accepted, :declined, :expired])
-      default(:draft)
+    attribute :status_code, :string do
+      constraints(max_length: 3)
     end
 
-    attribute :total_amount, :decimal do
-      constraints(precision: 10, scale: 2)
+    attribute :status_description, :string do
+      constraints(max_length: 35)
     end
 
-    attribute :notes, :string do
-      constraints(max_length: 1000)
+    attribute :collection_instructions, :string do
+      constraints(max_length: 500)
     end
 
+    attribute :delivery_instructions, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute(:estimated_kilometres, :integer)
+
+    attribute(:billable_units, :integer)
+
+    attribute :rate_type, :string do
+      constraints(max_length: 10)
+    end
+
+    attribute :rate_type_description, :string do
+      constraints(max_length: 35)
+    end
+
+    attribute(:total_quantity, :integer)
+
+    attribute :total_weight, :decimal do
+      constraints(precision: 15, scale: 2)
+    end
+
+    # Consignor fields
+    attribute :consignor_site, :string do
+      constraints(max_length: 15)
+    end
+
+    attribute :consignor_name, :string do
+      constraints(max_length: 70)
+    end
+
+    attribute :consignor_building, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignor_street, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignor_suburb, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignor_city, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignor_postal_code, :string do
+      constraints(max_length: 30)
+    end
+
+    attribute :consignor_contact_name, :string do
+      constraints(max_length: 70)
+    end
+
+    attribute :consignor_contact_tel, :string do
+      constraints(max_length: 15)
+    end
+
+    # Consignee fields
+    attribute :consignee_site, :string do
+      constraints(max_length: 15)
+    end
+
+    attribute :consignee_name, :string do
+      constraints(max_length: 70)
+    end
+
+    attribute :consignee_building, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignee_street, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignee_suburb, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignee_city, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :consignee_postal_code, :string do
+      constraints(max_length: 30)
+    end
+
+    attribute :consignee_contact_name, :string do
+      constraints(max_length: 70)
+    end
+
+    attribute :consignee_contact_tel, :string do
+      constraints(max_length: 15)
+    end
+
+    # Additional fields
+    attribute :waybill_number, :string do
+      constraints(max_length: 35)
+    end
+
+    attribute :collection_reference, :string do
+      constraints(max_length: 15)
+    end
+
+    attribute :accepted_by, :string do
+      constraints(max_length: 70)
+    end
+
+    attribute :reject_reason, :string do
+      constraints(max_length: 500)
+    end
+
+    attribute :order_number, :string do
+      constraints(max_length: 15)
+    end
+
+    attribute :value_declared, :decimal do
+      constraints(precision: 15, scale: 2)
+    end
+
+    attribute :charged_amount, :decimal do
+      constraints(precision: 15, scale: 2)
+    end
+
+    attribute :cash_account_type, :string do
+      constraints(max_length: 15)
+    end
+
+    attribute :paying_party, :string do
+      constraints(max_length: 15)
+    end
+
+    attribute :vehicle_category, :string do
+      constraints(max_length: 10)
+    end
+
+    # Embedded items
     attribute :items, {:array, :map} do
+      default([])
+    end
+
+    # Embedded sundries
+    attribute :sundries, {:array, :map} do
       default([])
     end
 
@@ -77,35 +214,114 @@ defmodule LogisticsQuotes.Quotes.Quote do
     create :create do
       accept([
         :quote_number,
-        :customer_name,
-        :customer_email,
-        :customer_phone,
-        :origin_address,
-        :destination_address,
-        :pickup_date,
-        :delivery_date,
-        :quote_type,
-        :status,
-        :total_amount,
-        :notes,
-        :items
+        :quote_obj,
+        :quote_date,
+        :account_reference,
+        :shipper_reference,
+        :service_type,
+        :service_type_description,
+        :consignment_type,
+        :consignment_type_desc,
+        :status_code,
+        :status_description,
+        :collection_instructions,
+        :delivery_instructions,
+        :estimated_kilometres,
+        :billable_units,
+        :rate_type,
+        :rate_type_description,
+        :total_quantity,
+        :total_weight,
+        :consignor_site,
+        :consignor_name,
+        :consignor_building,
+        :consignor_street,
+        :consignor_suburb,
+        :consignor_city,
+        :consignor_postal_code,
+        :consignor_contact_name,
+        :consignor_contact_tel,
+        :consignee_site,
+        :consignee_name,
+        :consignee_building,
+        :consignee_street,
+        :consignee_suburb,
+        :consignee_city,
+        :consignee_postal_code,
+        :consignee_contact_name,
+        :consignee_contact_tel,
+        :waybill_number,
+        :collection_reference,
+        :accepted_by,
+        :reject_reason,
+        :order_number,
+        :value_declared,
+        :charged_amount,
+        :cash_account_type,
+        :paying_party,
+        :vehicle_category,
+        :items,
+        :sundries
+      ])
+    end
+
+    create :quick_quote do
+      accept([
+        :account_reference,
+        :service_type,
+        :consignment_type,
+        :consignor_site,
+        :consignor_suburb,
+        :consignor_city,
+        :consignor_postal_code,
+        :consignee_site,
+        :consignee_suburb,
+        :consignee_city,
+        :consignee_postal_code,
+        :items,
+        :sundries
       ])
     end
 
     update :update do
       accept([
-        :quote_number,
-        :customer_email,
-        :customer_phone,
-        :origin_address,
-        :destination_address,
-        :pickup_date,
-        :delivery_date,
-        :quote_type,
-        :status,
-        :total_amount,
-        :notes,
-        :items
+        :quote_obj,
+        :account_reference,
+        :shipper_reference,
+        :service_type,
+        :consignment_type,
+        :collection_instructions,
+        :delivery_instructions,
+        :billable_units,
+        :rate_type,
+        :consignor_site,
+        :consignor_name,
+        :consignor_building,
+        :consignor_street,
+        :consignor_suburb,
+        :consignor_city,
+        :consignor_postal_code,
+        :consignor_contact_name,
+        :consignor_contact_tel,
+        :consignee_site,
+        :consignee_name,
+        :consignee_building,
+        :consignee_street,
+        :consignee_suburb,
+        :consignee_city,
+        :consignee_postal_code,
+        :consignee_contact_name,
+        :consignee_contact_tel,
+        :waybill_number,
+        :collection_reference,
+        :accepted_by,
+        :reject_reason,
+        :order_number,
+        :value_declared,
+        :paying_party,
+        :vehicle_category,
+        :items,
+        :sundries
       ])
     end
   end
