@@ -21,12 +21,6 @@ defmodule LogisticsQuotes.User do
         confirmation_required?(false)
       end
     end
-
-    tokens do
-      enabled?(true)
-      token_resource(LogisticsQuotes.Token)
-      signing_secret(LogisticsQuotes.Secrets)
-    end
   end
 
   attributes do
@@ -58,22 +52,6 @@ defmodule LogisticsQuotes.User do
     belongs_to(:branch, LogisticsQuotes.Branch) do
       source_attribute(:branch_id)
       destination_attribute(:id)
-    end
-  end
-
-  policies do
-    bypass AshAuthentication.Checks.AshAuthenticationInteraction do
-      authorize_if(always())
-    end
-
-    policy action_type(:read) do
-      authorize_if(expr(id == ^actor(:id)))
-      authorize_if(expr(organization_id == ^actor(:organization_id)))
-    end
-
-    policy action_type([:create, :update, :destroy]) do
-      authorize_if(expr(id == ^actor(:id)))
-      authorize_if(expr(organization_id == ^actor(:organization_id)))
     end
   end
 
