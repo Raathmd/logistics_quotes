@@ -1,3 +1,59 @@
+==> jose
+Compiling 112 files (.erl)
+Compiling 8 files (.ex)
+Generated jose app
+==> phoenix_view
+Compiling 1 file (.ex)
+Generated phoenix_view app
+==> slugify
+Compiling 1 file (.ex)
+Generated slugify app
+==> phoenix_html_helpers
+Compiling 6 files (.ex)
+Generated phoenix_html_helpers app
+==> joken
+Compiling 8 files (.ex)
+Generated joken app
+==> castore
+Compiling 1 file (.ex)
+Generated castore app
+==> mint
+Compiling 1 file (.erl)
+Compiling 20 files (.ex)
+Generated mint app
+==> finch
+Compiling 14 files (.ex)
+Generated finch app
+==> req
+Compiling 18 files (.ex)
+Generated req app
+==> assent
+Compiling 40 files (.ex)
+Generated assent app
+==> ash_authentication
+Compiling 147 files (.ex)
+Generated ash_authentication app
+==> swoosh
+Compiling 53 files (.ex)
+Generated swoosh app
+==> phoenix
+Compiling 73 files (.ex)
+Generated phoenix app
+==> phoenix_live_reload
+Compiling 5 files (.ex)
+Generated phoenix_live_reload app
+==> phoenix_live_view
+Compiling 39 files (.ex)
+Generated phoenix_live_view app
+==> phoenix_live_dashboard
+Compiling 36 files (.ex)
+Generated phoenix_live_dashboard app
+==> ash_phoenix
+Compiling 34 files (.ex)
+Generated ash_phoenix app
+==> ash_authentication_phoenix
+Compiling 43 files (.ex)
+Generated ash_authentication_phoenix app
 defmodule LogisticsQuotes.MixProject do
   use Mix.Project
 
@@ -61,7 +117,9 @@ defmodule LogisticsQuotes.MixProject do
       {:ash, "~> 3.4"},
       {:ash_phoenix, "~> 2.1"},
       {:ash_postgres, "~> 2.4"},
-      {:decimal, "~> 2.0"}
+      {:decimal, "~> 2.0"},
+      {:ash_authentication, "~> 4.0"},
+      {:ash_authentication_phoenix, "~> 2.0"}
     ]
   end
 
