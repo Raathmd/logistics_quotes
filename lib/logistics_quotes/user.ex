@@ -19,6 +19,7 @@ defmodule LogisticsQuotes.User do
         hashed_password_field(:hashed_password)
         hash_provider(AshAuthentication.BcryptProvider)
         confirmation_required?(false)
+        sign_in_tokens_enabled?(false)
       end
     end
   end
