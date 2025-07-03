@@ -38,7 +38,7 @@ defmodule LogisticsQuotesWeb.DashboardLive do
             <.nav_link navigate={~p"/users"} active={@active_nav == "users"}>
               <Heroicons.users class="w-5 h-5 mr-3" /> Users
             </.nav_link>
-            <.nav_link navigate={~p"/quotes"} active={@active_nav == "quotes"}>
+            <.nav_link navigate={~p"/quotes/new"} active={@active_nav == "quotes"}>
               <.icon name="hero-document-text" class="w-5 h-5 mr-3" /> Quotes
             </.nav_link>
           </div>
