@@ -2,11 +2,31 @@ defmodule LogisticsQuotes.User do
   use Ash.Resource,
     otp_app: :logistics_quotes,
     domain: LogisticsQuotes.Domain,
-    data_layer: AshPostgres.DataLayer
+    data_layer: AshPostgres.DataLayer,
+    extensions: [AshAuthentication]
 
   postgres do
     table("users")
     repo(LogisticsQuotes.Repo)
+  end
+
+  authentication do
+    api(LogisticsQuotes.Domain)
+
+    strategies do
+      password :password do
+        identity_field(:email)
+        hashed_password_field(:hashed_password)
+        hash_provider(AshAuthentication.BcryptProvider)
+        confirmation_required?(false)
+      end
+    end
+
+    tokens do
+      enabled?(true)
+      token_resource(LogisticsQuotes.Token)
+      signing_secret(LogisticsQuotes.Secrets)
+    end
   end
 
   attributes do
@@ -14,6 +34,7 @@ defmodule LogisticsQuotes.User do
     attribute(:name, :string, allow_nil?: false, public?: true)
     attribute(:email, :string, allow_nil?: false, public?: true)
     attribute(:username, :string, allow_nil?: false, public?: true)
+    attribute(:hashed_password, :string, allow_nil?: false, sensitive?: true)
     attribute(:active, :boolean, default: true, public?: true)
     attribute(:last_seen_at, :utc_datetime, public?: true)
     attribute(:organization_id, :uuid, allow_nil?: false, public?: true)
@@ -40,8 +61,32 @@ defmodule LogisticsQuotes.User do
     end
   end
 
+  policies do
+    bypass AshAuthentication.Checks.AshAuthenticationInteraction do
+      authorize_if(always())
+    end
+
+    policy action_type(:read) do
+      authorize_if(expr(id == ^actor(:id)))
+      authorize_if(expr(organization_id == ^actor(:organization_id)))
+    end
+
+    policy action_type([:create, :update, :destroy]) do
+      authorize_if(expr(id == ^actor(:id)))
+      authorize_if(expr(organization_id == ^actor(:organization_id)))
+    end
+  end
+
   actions do
-    defaults([:create, :read, :update, :destroy])
+    defaults([:read, :destroy])
+
+    create :create do
+      accept([:name, :email, :username, :organization_id, :account_id, :branch_id])
+    end
+
+    update :update do
+      accept([:name, :email, :username, :organization_id, :account_id, :branch_id])
+    end
 
     read(:by_organization) do
       argument(:organization_id, :uuid, allow_nil?: false)
